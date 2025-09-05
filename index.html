@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+      import { getAuth, onAuthStateChanged, signInAnonymously, signOut, setPersistence, browserLocalPersistence, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+      import { getFirestore, doc, getDoc, setDoc, onSnapshot, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+      window.firebaseSdk = { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signOut, setPersistence, browserLocalPersistence, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, getFirestore, doc, getDoc, setDoc, onSnapshot, enableIndexedDbPersistence };
+      window.FIREBASE_CONFIG = window.FIREBASE_CONFIG || null; // optional: user can paste config in settings
+    </script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ctext y='96' font-size='96'%3E%F0%9F%8F%A1%3C/text%3E%3C/svg%3E">
+    <script>
+      // Cloud-first: embed Firebase config so users don't need to paste it
+      window.FIREBASE_CONFIG = {
+        "apiKey": "AIzaSyAmOSD6k3t5GdakXxSyRelb1M24dJNOap0",
+        "authDomain": "productivity-app-c75db.firebaseapp.com",
+        "projectId": "productivity-app-c75db",
+        "storageBucket": "productivity-app-c75db.appspot.com",
+        "messagingSenderId": "246067701223",
+        "appId": "1:246067701223:web:468defe8f098af42e20942",
+        "measurementId": "G-ZD9NN9YLZC"
+      };
+    </script>
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <div class="date-picker">
+                <button id="prevDay" aria-label="Previous Day">◀</button>
+                <span id="currentDateLabel"></span>
+                <button id="nextDay" aria-label="Next Day">▶</button>
+            </div>
+            <div class="header-icons">
+                <button id="navHome" class="icon-btn" title="Home">🏡</button>
+                <button id="openAnalyticsPanel" class="icon-btn" title="Analytics"><img src="images/analytics-icon.png" alt="Analytics"/></button>
+                <button id="openSettingsPanel" class="icon-btn" title="Settings"><img src="images/gear-icon.webp" alt="Settings"/></button>
+            </div>
+        </header>
+
+        <!-- Tabs removed; use header icons instead -->
+
+        <main>
+            <section id="tab-today" class="tab-panel active">
+
+                <div class="columns">
+                    <div class="column" id="todayColumn">
+                        <div class="column-header">
+                            <div class="label"><h3>Today’s Tasks</h3><span id="todayProgress" class="sub"></span></div>
+                            <button id="openAddToday" class="secondary small">+ Add Task</button>
+                        </div>
+                        <div class="scroll-area">
+                            <ul id="todayList" class="bubble-list droppable" aria-label="Today list"></ul>
+                        </div>
+                    </div>
+
+                    <div class="column" id="backlogColumn">
+                        <div class="column-header">
+                            <h3>Unscheduled Tasks</h3><button id="openAddBacklog" class="secondary small">+ Add Task</button>
+                        </div>
+                        <div class="scroll-area">
+                            <ul id="backlogList" class="bubble-list droppable" aria-label="Backlog list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dedicated backlog page removed -->
+
+            <section id="tab-analytics" class="tab-panel">
+                <div class="panel-header">
+                    <h2>Analytics</h2>
+                </div>
+                <div class="coming-soon">Coming Soon</div>
+            </section>
+
+            <section id="tab-settings" class="tab-panel">
+                <div class="panel-header">
+                    <h2>Settings</h2>
+                </div>
+                <div class="settings">
+                    <div>
+                        <h3>Cloud & Data</h3>
+                        <p id="storageStatus" class="sub"></p>
+                        <div class="inline-add" style="margin-top: 6px;">
+                            <button id="exportJson" class="secondary">Export JSON</button>
+                            <input id="importJsonInput" type="file" accept="application/json" style="display:none" />
+                            <button id="importJson" class="secondary">Import JSON</button>
+                        </div>
+                        <div class="divider"></div>
+                        <div>
+                          <h4>Cloud Sync (Firebase)</h4>
+                          <p class="sub">Enter your email to sign in. Config is built-in.</p>
+                          <div class="inline-add" style="margin-top:6px;">
+                            <input id="firebaseEmail" type="email" placeholder="you@example.com" />
+                            <button id="firebaseSendLink" class="secondary">Send Email Link</button>
+                            <button id="firebaseSignOut" class="secondary">Sign Out</button>
+                          </div>
+                          <p id="firebaseStatus" class="sub"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addModal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <h3 id="addModalTitle">Add Task</h3>
+        <label>Task name<input id="addModalName" type="text" placeholder="e.g., Buy soap" /></label>
+        <label>Length (optional)<input id="addModalTime" type="text" placeholder="e.g., 20m or 1h" /></label>
+        <div class="modal-actions">
+          <button id="addModalCancel" class="secondary">Cancel</button>
+          <button id="addModalSave" class="primary">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
